@@ -7,6 +7,8 @@ import argparse
 import cv2
 import imutils
 import time
+from Regionify import Regionify
+from play import play
 
 
 def detect_objects(img, pts):
@@ -72,6 +74,9 @@ else:
 # allow the camera or video file to warm up
 time.sleep(2.0)
 
+frame = vs.read()
+rows, cols, channels = frame.shape
+regions, references = Regionify(frame, instrument="xylophone")
 # keep looping
 while True:
 	# grab the current frame
@@ -95,27 +100,18 @@ while True:
 			continue
 		# check to see if enough points have been accumulated in
 		# the buffer
-		if counter >= 10 and i == 1 and pts[-10] is not None:
+		if counter >= 10 and i == 1 and len(pts) > 10:
 			# compute the difference between the x and y
 			# coordinates and re-initialize the direction
 			# text variables
 			dX = pts[-10][0] - pts[i][0]
 			dY = pts[-10][1] - pts[i][1]
 			(dirX, dirY) = ("", "")
-			# ensure there is significant movement in the
-			# x-direction
-			if np.abs(dX) > 20:
-				dirX = "East" if np.sign(dX) == 1 else "West"
-			# ensure there is significant movement in the
-			# y-direction
-			if np.abs(dY) > 20:
-				dirY = "North" if np.sign(dY) == 1 else "South"
-			# handle when both directions are non-empty
-			if dirX != "" and dirY != "":
-				direction = "{}-{}".format(dirY, dirX)
-			# otherwise, only one direction is non-empty
-			else:
-				direction = dirX if dirX != "" else dirY
+			direction= "Test"
+
+			velocity = np.array([dX, dY])
+			point = pts[i]
+			play(point, velocity, regions, references)
 
 		# otherwise, compute the thickness of the line and
 		# draw the connecting lines

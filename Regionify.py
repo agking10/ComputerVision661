@@ -34,7 +34,7 @@ def Regionify(img, instrument='drums'):
         return scaled_x, scaled_y
 
     # Obtain dimensions of image
-    rows, cols = img.shape
+    rows, cols, channels = img.shape
 
     if instrument == 'drums':
 
@@ -73,11 +73,11 @@ def Regionify(img, instrument='drums'):
         scaled_x, scaled_y = scale(wanted_x, wanted_y, cols, rows)
 
         # Define sound reference dictionary
-        references = {1: ('xylophone1.wav', [-scaled_x[-1], -scaled_y[-1]]),
-                      2: ('xylophone2.wav', [-scaled_x[-1], -scaled_y[-1]]),
-                      3: ('xylophone3.wav', [-scaled_x[-1], -scaled_y[-1]]),
-                      4: ('xylophone4.wav', [-scaled_x[-1], -scaled_y[-1]]),
-                      5: ('xylophone5.wav', [-scaled_x[-1], -scaled_y[-1]])}
+        references = {1: ('a.wav', [-scaled_x[-1], -scaled_y[-1]]),
+                      2: ('b.wav', [-scaled_x[-1], -scaled_y[-1]]),
+                      3: ('c.wav', [-scaled_x[-1], -scaled_y[-1]]),
+                      4: ('d.wav', [-scaled_x[-1], -scaled_y[-1]]),
+                      5: ('e.wav', [-scaled_x[-1], -scaled_y[-1]])}
 
         # DEFINE REGIONS
         regions = np.array([[[scaled_y[0], 0], [scaled_y[1], scaled_x[0]]]
@@ -114,4 +114,4 @@ def Regionify(img, instrument='drums'):
         img_array = np.zeros((rows, cols))
         img_array = regionsFunc(img_array, regions)
 
-    return img_array, references
+    return img_array.astype(int).T, references
