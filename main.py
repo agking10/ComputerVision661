@@ -9,6 +9,7 @@ import imutils
 import time
 from Regionify import Regionify
 from play import play
+import threading
 
 
 def detect_objects(img, pts):
@@ -74,6 +75,8 @@ else:
 # allow the camera or video file to warm up
 time.sleep(2.0)
 
+global playing
+playing = False
 frame = vs.read()
 rows, cols, channels = frame.shape
 regions, references = Regionify(frame, instrument="xylophone")
@@ -111,7 +114,10 @@ while True:
 
 			velocity = np.array([dX, dY])
 			point = pts[i]
-			play(point, velocity, regions, references)
+			if playing == False:
+				t = threading.Thread(target=play, args=(point, velocity, regions, references, playing))
+				t.start()
+				#play(point, velocity, regions, references, playing)
 
 		# otherwise, compute the thickness of the line and
 		# draw the connecting lines

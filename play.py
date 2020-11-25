@@ -2,23 +2,26 @@ import numpy as np
 from playsound import playsound
 
 
-def play(coords, velocity, regions, references):
-    threshold = 0
-    
-    row = coords[0]
-    col = coords[1]
+def play(coords, velocity, regions, references, playing):
+    if playing == False:
+        threshold = 0
 
-    region = regions[row][col]
-    if region==0:
-        return
-    target_vel = np.array(references[region][1])
-    sound = references[region][0]
-    speed = np.linalg.norm(velocity)
-    cosine = np.dot(velocity, target_vel) / (speed * np.linalg.norm(target_vel))
-    if cosine > 0.7 and speed > threshold:
-        sound_path = "./sounds/"
-        sound = sound_path + sound
-        playsound(sound)
+        row = coords[0]
+        col = coords[1]
+
+        region = regions[row][col]
+        if region == 0:
+            return
+        target_vel = np.array(references[region][1])
+        sound = references[region][0]
+        speed = np.linalg.norm(velocity)
+        cosine = np.dot(velocity, target_vel) / (speed * np.linalg.norm(target_vel))
+        if cosine > 0.7 and speed > threshold:
+            playing = True
+            sound_path = "./sounds/"
+            sound = sound_path + sound
+            playsound(sound)
+        playing = False
 
 
 if __name__ == "__main__":
