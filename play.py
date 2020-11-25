@@ -1,6 +1,5 @@
 import numpy as np
-from pydub import AudioSegment
-from pydub.playback import play
+from playsound import playsound
 
 
 def play_note(coords, velocity, regions, references, instrument):
@@ -14,28 +13,29 @@ def play_note(coords, velocity, regions, references, instrument):
     note_path = './' + instrument + '/' + note
     
     if velocity > threshold:
-        sound = AudioSegment.from_wav(note_path)
-        play(sound)
+        playsound(note_path)
 
-instrument = 'xylophone'
-regions = np.array([[1,2],[3,4]])
-references = {
-    1: 'a.wav',
-    2: 'b.wav',
-    3: 'c.wav',
-    4: 'c2.wav'
-}
 
-velocity = 10
+if __name__ == "__main__":
+    instrument = 'xylophone'
+    regions = np.array([[1,2],[3,4]])
+    references = {
+        1: 'a.wav',
+        2: 'b.wav',
+        3: 'c.wav',
+        4: 'c2.wav'
+    }
 
-x = 0
-y = 0
-for i in range(2):
-    for j in range(2):
-        play_note((x,y), velocity, regions, references, instrument)
-        y += 1
-    x += 1
+    velocity = 10
+
+    x = 0
     y = 0
+    for i in range(2):
+        for j in range(2):
+            play_note((x,y), velocity, regions, references, instrument)
+            y += 1
+        x += 1
+        y = 0
 
 
                    
