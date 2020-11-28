@@ -44,7 +44,7 @@ def detect_objects(img, pts):
 			cv2.circle(img, (int(x), int(y)), int(radius),
 					   (0, 255, 255), 2)
 			cv2.circle(img, center, 5, (0, 0, 255), -1)
-			pts.appendleft(center)
+	pts.appendleft(center)
 	return pts
 
 # construct the argument parse and parse the arguments
@@ -104,7 +104,7 @@ while True:
 			continue
 		# check to see if enough points have been accumulated in
 		# the buffer
-		if counter >= 10 and i == 1 and len(pts) > 10:
+		if counter >= 10 and i == 1 and pts[-10] is not None:
 			# compute the difference between the x and y
 			# coordinates and re-initialize the direction
 			# text variables
@@ -115,6 +115,7 @@ while True:
 
 			velocity = np.array([dX, dY])
 			point = pts[i]
+
 			if playing == False:
 				t = threading.Thread(target=play, args=(point, velocity, regions, references, playing))
 				t.start()
