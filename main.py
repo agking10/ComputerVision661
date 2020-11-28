@@ -80,6 +80,7 @@ playing = False
 frame = vs.read()
 rows, cols, channels = frame.shape
 regions, references = Regionify(frame, instrument="xylophone")
+regions = imutils.resize(regions, width = 600)
 # keep looping
 while True:
 	# grab the current frame
@@ -130,6 +131,16 @@ while True:
 	cv2.putText(frame, "dx: {}, dy: {}".format(dX, dY),
 		(10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
 		0.35, (0, 0, 255), 1)
+	#color the regions so the user knows which areas are the instruments
+	#extract only those areas in img that is a instrument region
+	extraction = (regions >= 1)*frame
+	frame = frame - extraction
+    #Alpha add the regions and extraction and reform the image
+	foreground = cv2.multiply(0.8, extraction)
+	background = cv2.multiply(10, regions)
+	combined = cv2.add(foreground, background)
+	frame = frame+combined
+
 	# show the frame to our screen and increment the frame counter
 	cv2.imshow("Frame", frame)
 	key = cv2.waitKey(1) & 0xFF
