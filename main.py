@@ -81,6 +81,8 @@ frame = vs.read()
 rows, cols, channels = frame.shape
 regions, references = Regionify(frame, instrument="xylophone")
 regions = imutils.resize(regions, width = 600)
+regions_3D = regions.reshape(regions.shape[0],regions.shape[1],1)
+regions_3D = np.concatenate((regions_3D,regions_3D,regions_3D),axis = 2)
 # keep looping
 while True:
 	# grab the current frame
@@ -134,11 +136,13 @@ while True:
 		0.35, (0, 0, 255), 1)
 	#color the regions so the user knows which areas are the instruments
 	#extract only those areas in img that is a instrument region
-	extraction = (regions >= 1)*frame
+	extraction = (regions_3D >= 1)*frame
 	frame = frame - extraction
     #Alpha add the regions and extraction and reform the image
-	foreground = cv2.multiply(0.8, extraction)
-	background = cv2.multiply(10, regions)
+	foreground = 0.8 * extraction
+	foreground = foreground.astype(np.uint8)
+	background = 10.0 * regions_3D
+	background = background.astype(np.uint8)
 	combined = cv2.add(foreground, background)
 	frame = frame+combined
 
