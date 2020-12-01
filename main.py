@@ -8,7 +8,7 @@ import cv2
 import imutils
 import time
 from Regionify import Regionify
-from play import play
+from play import playSound
 import threading
 
 

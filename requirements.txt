@@ -1,3 +1,8 @@
 numpy
 opencv-python
-playsound
+pydub
+simpleaudio
+#On Mac, Linux, pip install ffmpeg is fine.
+#On windows, you must download ffmpeg from https://ffmpeg.org/download.html .
+#Extract files, then add the bin folder to your PATH variables.
+ffmpeg
