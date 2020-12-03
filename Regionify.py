@@ -38,9 +38,10 @@ def Regionify(img, instrument='drums'):
 
     if instrument == 'drums':
 
+        # Set velocity, assuming lengthx600
+        velx = 0
+        vely = -80
         # Determine coords to be scaled, assuming 1000x1000
-        velx = 10
-        vely = 10
         wanted_x = [333, 666, 1000, velx]
         wanted_y = [666, 1000, vely]
 
@@ -48,9 +49,9 @@ def Regionify(img, instrument='drums'):
         scaled_x, scaled_y = scale(wanted_x, wanted_y, cols, rows)
 
         # Define sound reference dictionary
-        references = {1: ('drums1.wav', [-scaled_x[-1], -scaled_y[-1]]),
-                      2: ('drums2.wav', [-scaled_x[-1], -scaled_y[-1]]),
-                      3: ('drums3.wav', [-scaled_x[-1], -scaled_y[-1]])}
+        references = {1: ('drums1.wav', [velx, vely]),
+                      2: ('drums2.wav', [velx, vely]),
+                      3: ('drums3.wav', [velx, vely])}
 
         # DEFINE REGIONS
         regions = np.array([[[scaled_y[0], 0], [scaled_y[1], scaled_x[0]]]
@@ -63,9 +64,11 @@ def Regionify(img, instrument='drums'):
         img_array = regionsFunc(img_array, regions)
 
     elif instrument == 'xylophone':
+        
+        # Set velocity, assuming lengthx600
+        velx = 0
+        vely = -80
         # Determine coords to be scaled, assuming 1000x1000
-        velx = 5
-        vely = 5
         wanted_x = [200, 400, 600, 800, 1000, velx]
         wanted_y = [666, 1000, vely]
 
@@ -73,11 +76,11 @@ def Regionify(img, instrument='drums'):
         scaled_x, scaled_y = scale(wanted_x, wanted_y, cols, rows)
 
         # Define sound reference dictionary
-        references = {1: ('a.wav', [-scaled_x[-1], -scaled_y[-1]]),
-                      2: ('b.wav', [-scaled_x[-1], -scaled_y[-1]]),
-                      3: ('c.wav', [-scaled_x[-1], -scaled_y[-1]]),
-                      4: ('d.wav', [-scaled_x[-1], -scaled_y[-1]]),
-                      5: ('e.wav', [-scaled_x[-1], -scaled_y[-1]])}
+        references = {1: ('c.wav', [velx, vely]),
+                      2: ('d.wav', [velx, vely]),
+                      3: ('e.wav', [velx, vely]),
+                      4: ('f.wav', [velx, vely]),
+                      5: ('g.wav', [velx, vely])}
 
         # DEFINE REGIONS
         regions = np.array([[[scaled_y[0], 0], [scaled_y[1], scaled_x[0]]]
@@ -94,9 +97,10 @@ def Regionify(img, instrument='drums'):
 
     elif instrument == 'snare':
 
+        # Set velocity, assuming lengthx600
+        velx = 0
+        vely = -80
         # Determine coords to be scaled, assuming 1000x1000
-        velx = 10
-        vely = 10
         wanted_x = [300, 700, velx]
         wanted_y = [500, 800, vely]
 
@@ -104,7 +108,7 @@ def Regionify(img, instrument='drums'):
         scaled_x, scaled_y = scale(wanted_x, wanted_y, cols, rows)
 
         # Define sound reference dictionary
-        references = {1: ('snare1.wav', [-scaled_x[-1], -scaled_y[-1]])}
+        references = {1: ('snare1.wav', [velx, vely])}
 
         # DEFINE REGIONS
         regions = np.array([[[scaled_y[0], scaled_x[0]], [scaled_y[1], scaled_x[1]]]
@@ -114,4 +118,5 @@ def Regionify(img, instrument='drums'):
         img_array = np.zeros((rows, cols))
         img_array = regionsFunc(img_array, regions)
 
-    return img_array.astype(int).T, references
+    img_array = img_array.reshape(img_array.shape[0],img_array.shape[1],1)
+    return img_array.astype(np.uint8), references

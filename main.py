@@ -8,8 +8,72 @@ import cv2
 import imutils
 import time
 from Regionify import Regionify
-from play import playSound
+from pydub import AudioSegment
+from pydub.playback import play
+from playsound import playsound
 import threading
+import time
+
+def playOneSound(sounds):
+    global lastPlayed
+    if(time.time() - lastPlayed > 0.25):
+	    lastPlayed = time.time()
+	    sound_path = "./sounds/"
+	    filename = sound_path + sounds[0]
+	    sound = AudioSegment.from_file(filename, format='wav')
+	    play(sound)
+
+def playTwoSounds(sounds):
+    global lastPlayed
+    if(time.time() - lastPlayed > 1):
+	    sound_path = "./sounds/"
+	    f1 = sound_path + sounds[0]
+	    f2 = sound_path + sounds[1]
+	    sound1 = AudioSegment.from_file(f1, format='wav')
+	    sound2 = AudioSegment.from_file(f2, format='wav')
+	    sound = sound1.overlay(sound2)
+	    play(sound)
+	    lastPlayed = time.time()
+
+def doNothing(sounds):
+    return
+
+actions = {
+    0: doNothing,
+    1: playOneSound,
+    2: playTwoSounds
+}
+
+def playSound(coords, velocities, regions, references):
+    sounds = []
+    for i in range(len(coords)):
+        coord = coords[i]
+        velocity = velocities[i]
+
+        row = coord[1]
+        col = coord[0]
+
+        region = regions[row][col]
+        if region == 0:
+            return
+        target_vel = np.array(references[region][1])
+        sound = references[region][0]
+        speed = np.linalg.norm(velocity)
+        threshold = np.linalg.norm(target_vel)
+        if speed == 0:
+            return
+        cosine = np.dot(velocity, target_vel) / (speed * threshold)
+
+        if cosine > 0.7 and speed > threshold:
+            sounds.append(sound)
+
+
+    if(time.time() - lastPlayed > 0.1):
+        action = actions[len(sounds)]
+        action(sounds)
+
+
+
 
 
 def detect_objects(img, pts):
@@ -75,14 +139,15 @@ else:
 # allow the camera or video file to warm up
 time.sleep(2.0)
 
-global playing
-playing = False
+global lastPlayed
 frame = vs.read()
 rows, cols, channels = frame.shape
 regions, references = Regionify(frame, instrument="xylophone")
 regions = imutils.resize(regions, width = 600)
 regions_3D = regions.reshape(regions.shape[0],regions.shape[1],1)
 regions_3D = np.concatenate((regions_3D,regions_3D,regions_3D),axis = 2)
+lastPlayed = time.time()
+
 # keep looping
 while True:
 	# grab the current frame
@@ -115,13 +180,22 @@ while True:
 			(dirX, dirY) = ("", "")
 			direction= "Test"
 
+			#velocity = [[dX, dY]], because playSound uses a list of velocities
 			velocity = np.array([dX, dY])
-			point = pts[i]
+			velocity = velocity.reshape(1,2)
 
-			if playing == False:
-				t = threading.Thread(target=play, args=(point, velocity, regions, references, playing))
+			#point = [[X, Y]], because playSound uses a list of coords
+			point = pts[i]
+			point = np.array(point)
+			point = point.reshape(1,2)
+
+			print(time.time() - lastPlayed)
+
+			if(time.time() - lastPlayed > 0.025):
+				t = threading.Thread(target=playSound, args=(point, velocity, regions, references))
 				t.start()
-				#play(point, velocity, regions, references, playing)
+
+				#play(point, velocity, regions, references)
 
 		# otherwise, compute the thickness of the line and
 		# draw the connecting lines
@@ -139,9 +213,9 @@ while True:
 	extraction = (regions_3D >= 1)*frame
 	frame = frame - extraction
     #Alpha add the regions and extraction and reform the image
-	foreground = 0.8 * extraction
+	foreground = 0.7 * extraction
 	foreground = foreground.astype(np.uint8)
-	background = 10.0 * regions_3D
+	background = 14.0 * regions_3D
 	background = background.astype(np.uint8)
 	combined = cv2.add(foreground, background)
 	frame = frame+combined
