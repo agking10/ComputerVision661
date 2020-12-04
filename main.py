@@ -78,7 +78,7 @@ def playSound(coords, velocities, regions, references):
 def detect_objects(img, pts, num_objs = 1, color = 'green'):
     blurred = cv2.GaussianBlur(img, (11, 11), 0)
     #todo change back to HSV??
-    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2RGB)
+    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
     # construct a mask for the color "green", then perform
     # a series of dilations and erosions to remove any small
     # blobs left in the mask
@@ -256,6 +256,7 @@ while True:
     background = background.astype(np.uint8)
     combined = cv2.add(foreground, background)
     frame = frame+combined
+    frame = cv2.flip(frame, 1)
 
     # show the frame to our screen and increment the frame counter
     cv2.imshow("Frame", frame)
