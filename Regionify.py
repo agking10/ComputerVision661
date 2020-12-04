@@ -40,7 +40,7 @@ def Regionify(img, instrument='drums'):
 
         # Set velocity, assuming lengthx600
         velx = 0
-        vely = -80
+        vely = -70
         # Determine coords to be scaled, assuming 1000x1000
         wanted_x = [333, 666, 1000, velx]
         wanted_y = [666, 1000, vely]
@@ -67,20 +67,21 @@ def Regionify(img, instrument='drums'):
         
         # Set velocity, assuming lengthx600
         velx = 0
-        vely = -80
+        vely = -70
         # Determine coords to be scaled, assuming 1000x1000
-        wanted_x = [200, 400, 600, 800, 1000, velx]
+        wanted_x = [166, 333, 500, 666, 833, 1000, velx]
         wanted_y = [666, 1000, vely]
 
         # Scale the coords
         scaled_x, scaled_y = scale(wanted_x, wanted_y, cols, rows)
 
         # Define sound reference dictionary
-        references = {1: ('c.wav', [velx, vely]),
-                      2: ('d.wav', [velx, vely]),
-                      3: ('e.wav', [velx, vely]),
-                      4: ('f.wav', [velx, vely]),
-                      5: ('g.wav', [velx, vely])}
+        references = {1: ('b.wav', [velx, vely]),
+                      2: ('c.wav', [velx, vely]),
+                      3: ('d.wav', [velx, vely]),
+                      4: ('e.wav', [velx, vely]),
+                      5: ('f.wav', [velx, vely])
+                      6: ('g.wav', [velx, vely])}
 
         # DEFINE REGIONS
         regions = np.array([[[scaled_y[0], 0], [scaled_y[1], scaled_x[0]]]
@@ -88,6 +89,7 @@ def Regionify(img, instrument='drums'):
                                , [[scaled_y[0], scaled_x[1]], [scaled_y[1], scaled_x[2]]]
                                , [[scaled_y[0], scaled_x[2]], [scaled_y[1], scaled_x[3]]]
                                , [[scaled_y[0], scaled_x[3]], [scaled_y[1], scaled_x[4]]]
+                               , [[scaled_y[0], scaled_x[4]], [scaled_y[1], scaled_x[5]]]
                             ]).astype(np.int)
 
         # Populate instrument regions array
@@ -99,7 +101,7 @@ def Regionify(img, instrument='drums'):
 
         # Set velocity, assuming lengthx600
         velx = 0
-        vely = -80
+        vely = -70
         # Determine coords to be scaled, assuming 1000x1000
         wanted_x = [300, 700, velx]
         wanted_y = [500, 800, vely]
