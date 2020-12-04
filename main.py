@@ -176,6 +176,7 @@ while True:
     frame = vs.read()
     # handle the frame from VideoCapture or VideoStream
     frame = frame[1] if args.get("video", False) else frame
+    frame = cv2.flip(frame, 1)
     # if we are viewing a video and we did not grab a frame,
     # then we have reached the end of the video
     if frame is None:
@@ -256,7 +257,7 @@ while True:
     background = background.astype(np.uint8)
     combined = cv2.add(foreground, background)
     frame = frame+combined
-    frame = cv2.flip(frame, 1)
+
 
     # show the frame to our screen and increment the frame counter
     cv2.imshow("Frame", frame)
