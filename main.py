@@ -10,6 +10,8 @@ import time
 from Regionify import Regionify
 from play import playSound
 import threading
+from multiprocessing import Process, Queue
+
 
 
 def detect_objects(img, pts):
@@ -80,9 +82,21 @@ playing = False
 frame = vs.read()
 rows, cols, channels = frame.shape
 regions, references = Regionify(frame, instrument="xylophone")
-regions = imutils.resize(regions, width = 600)
-regions_3D = regions.reshape(regions.shape[0],regions.shape[1],1)
-regions_3D = np.concatenate((regions_3D,regions_3D,regions_3D),axis = 2)
+# regions = imutils.resize(regions, width = 600)
+# regions_3D = regions.reshape(regions.shape[0],regions.shape[1],1)
+# regions_3D = np.concatenate((regions_3D,regions_3D,regions_3D),axis = 2)
+
+# task_queues = []
+# region_queues = {}
+locks = []
+for i in range(1, len(np.unique(regions))):
+	locks.append(threading.Lock())
+
+def worker(region, *args):
+	locks[region-1].acquire()
+	playSound(*args)
+	locks[region-1].release()
+
 # keep looping
 while True:
 	# grab the current frame
@@ -115,11 +129,12 @@ while True:
 			(dirX, dirY) = ("", "")
 			direction= "Test"
 
-			velocity = np.array([dX, dY])
-			point = pts[i]
+			velocities = [np.array([dX, dY])]
+			points = [pts[i]]
+			region = regions[points[0]]
 
-			if playing == False:
-				t = threading.Thread(target=play, args=(point, velocity, regions, references, playing))
+			if not locks[region-1].locked():
+				t = threading.Thread(target=worker, args=(region, points, velocities, regions, references, playing))
 				t.start()
 				#play(point, velocity, regions, references, playing)
 
@@ -129,22 +144,20 @@ while True:
 		cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
 	# show the movement deltas and the direction of movement on
 	# the frame
-	cv2.putText(frame, direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
-		0.65, (0, 0, 255), 3)
 	cv2.putText(frame, "dx: {}, dy: {}".format(dX, dY),
 		(10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
 		0.35, (0, 0, 255), 1)
 	#color the regions so the user knows which areas are the instruments
 	#extract only those areas in img that is a instrument region
-	extraction = (regions_3D >= 1)*frame
-	frame = frame - extraction
-    #Alpha add the regions and extraction and reform the image
-	foreground = 0.8 * extraction
-	foreground = foreground.astype(np.uint8)
-	background = 10.0 * regions_3D
-	background = background.astype(np.uint8)
-	combined = cv2.add(foreground, background)
-	frame = frame+combined
+	# extraction = (regions_3D >= 1)*frame
+	# frame = frame - extraction
+    # #Alpha add the regions and extraction and reform the image
+	# foreground = 0.8 * extraction
+	# foreground = foreground.astype(np.uint8)
+	# background = 10.0 * regions_3D
+	# background = background.astype(np.uint8)
+	# combined = cv2.add(foreground, background)
+	# frame = frame+combined
 
 	# show the frame to our screen and increment the frame counter
 	cv2.imshow("Frame", frame)
