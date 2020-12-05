@@ -1,67 +1,39 @@
 import numpy as np
 from playsound import playsound
 from pydub import AudioSegment
+import time
 from pydub.playback import play
+import settings
+
+THRESHOLD = 0.5
+
+def playOneSound(sound, region):
+    if (time.time() - settings.lastPlayed[region]) > THRESHOLD:
+        settings.lastPlayed[region] = time.time()
+        sound_path = "./sounds/"
+        filename = sound_path + sound
+        sound = AudioSegment.from_file(filename, format='wav')
+        play(sound)
 
 
-def playOneSound(sounds, playing):
-    playing = True
-    sound_path = "./sounds/"
-    filename = sound_path + sounds[0]
-    sound = AudioSegment.from_file(filename, format='wav')
-    play(sound)
-    playing = True
+def playSound(coord, velocity, regions, references):
+
+    threshold = 0
+
+    row = coord[1]
+    col = coord[0]
+
+    region = regions[row][col]
+    if region == 0:
+        return
+    target_vel = np.array(references[region][1])
+    sound = references[region][0]
+    speed = np.linalg.norm(velocity)
+    cosine = np.dot(velocity, target_vel) / (speed * np.linalg.norm(target_vel))
 
 
-def playTwoSounds(sounds, playing):
-    playing = True
-    sound_path = "./sounds/"
-    f1 = sound_path + sounds[0]
-    f2 = sound_path + sounds[1]
-    sound1 = AudioSegment.from_file(f1, format='wav')
-    sound2 = AudioSegment.from_file(f2, format='wav')
-    sound = sound1.overlay(sound2)
-    play(sound)
-
-
-def doNothing(sounds, playing):
-    return
-
-
-actions = {
-    0: doNothing,
-    1: playOneSound,
-    2: playTwoSounds
-}
-
-
-def playSound(coords, velocities, regions, references, playing):
-
-    sounds = []
-    for i in range(len(coords)):
-        coord = coords[i]
-        velocity = velocities[i]
-        threshold = 0
-
-        row = coord[0]
-        col = coord[1]
-
-        region = regions[row][col]
-        if region == 0:
-            return
-        target_vel = np.array(references[region][1])
-        sound = references[region][0]
-        speed = np.linalg.norm(velocity)
-        cosine = np.dot(velocity, target_vel) / (speed * np.linalg.norm(target_vel))
-
-
-        if cosine > 0.7 and speed > threshold:
-            sounds.append(sound)
-
-    if playing == False:
-        action = actions[len(sounds)]
-        action(sounds, playing)
-    playing = False
+    if cosine > 0.7 and speed > threshold:
+        playOneSound(sound, region)
 
 
 if __name__ == "__main__":

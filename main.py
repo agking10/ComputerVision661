@@ -6,73 +6,11 @@ import numpy as np
 import argparse
 import cv2
 import imutils
-import time
 from Regionify import Regionify
-from pydub import AudioSegment
-from pydub.playback import play
-from playsound import playsound
+from play import playSound
 import threading
 import time
-
-def playOneSound(sounds):
-    global lastPlayed
-    if(time.time() - lastPlayed > 0.25):
-        lastPlayed = time.time()
-        sound_path = "./sounds/"
-        filename = sound_path + sounds[0]
-        sound = AudioSegment.from_file(filename, format='wav')
-        play(sound)
-
-def playTwoSounds(sounds):
-    global lastPlayed
-    if(time.time() - lastPlayed > 1):
-        sound_path = "./sounds/"
-        f1 = sound_path + sounds[0]
-        f2 = sound_path + sounds[1]
-        sound1 = AudioSegment.from_file(f1, format='wav')
-        sound2 = AudioSegment.from_file(f2, format='wav')
-        sound = sound1.overlay(sound2)
-        play(sound)
-        lastPlayed = time.time()
-
-def doNothing(sounds):
-    return
-
-actions = {
-    0: doNothing,
-    1: playOneSound,
-    2: playTwoSounds
-}
-
-
-def playSound(coords, velocities, regions, references):
-    sounds = []
-    for i in range(len(coords)):
-        coord = coords[i]
-        velocity = velocities[i]
-
-        row = coord[1]
-        col = coord[0]
-
-        region = regions[row][col]
-        if region == 0:
-            return
-        target_vel = np.array(references[region][1])
-        sound = references[region][0]
-        speed = np.linalg.norm(velocity)
-        threshold = np.linalg.norm(target_vel)
-        if speed == 0:
-            return
-        cosine = np.dot(velocity, target_vel) / (speed * threshold)
-
-        if cosine > 0.7 and speed > threshold:
-            sounds.append(sound)
-
-
-    if(time.time() - lastPlayed > 0.1):
-        action = actions[len(sounds)]
-        action(sounds)
-
+import settings
 
 
 def detect_objects(img, pts, num_objs = 1, color = 'green'):
@@ -117,7 +55,7 @@ def detect_objects(img, pts, num_objs = 1, color = 'green'):
                 cv2.circle(img, (int(x), int(y)), int(radius),
                            (0, 255, 255), 2)
                 cv2.circle(img, center, 5, (0, 0, 255), -1)
-                pts.appendleft(center)
+    pts.appendleft(center)
 
     return pts
 
@@ -157,9 +95,6 @@ else:
 # allow the camera or video file to warm up
 time.sleep(2.0)
 
-global lastPlayed
-
-playing = False
 num_objs = int(input("Enter how many balls you are using: "))
 
 frame = vs.read()
@@ -168,7 +103,10 @@ regions, references = Regionify(frame, instrument="xylophone")
 regions = imutils.resize(regions, width = 600)
 regions_3D = regions.reshape(regions.shape[0],regions.shape[1],1)
 regions_3D = np.concatenate((regions_3D,regions_3D,regions_3D),axis = 2)
-lastPlayed = time.time()
+region_list = set(np.unique(regions))
+region_list.discard(0)
+
+settings.init(region_list)
 
 # keep looping
 while True:
@@ -215,11 +153,12 @@ while True:
                 # point = [[X, Y]], because playSound uses a list of coords
                 point = pts[i]
                 point = np.array(point)
-                point = point.reshape(1,2)
+                #point = point.reshape(1, 2)
 
-                print(time.time() - lastPlayed)
+                region = regions[point[1], point[0]]
+                lastPlayed = settings.lastPlayed[region]
 
-                if (time.time() - lastPlayed > 0.025):
+                if region != 0 and (time.time() - lastPlayed > 0.025):
                     t = threading.Thread(target=playSound, args=(point, velocity, regions, references))
                     t.start()
                     # play(point, velocity, regions, references)

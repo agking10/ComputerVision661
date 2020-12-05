@@ -80,7 +80,7 @@ def Regionify(img, instrument='drums'):
                       2: ('c.wav', [velx, vely]),
                       3: ('d.wav', [velx, vely]),
                       4: ('e.wav', [velx, vely]),
-                      5: ('f.wav', [velx, vely])
+                      5: ('f.wav', [velx, vely]),
                       6: ('g.wav', [velx, vely])}
 
         # DEFINE REGIONS
