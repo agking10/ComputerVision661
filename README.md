@@ -16,5 +16,8 @@ IMPORTANT NOTE: If you are on windows, you will need to do the following to inst
         <li>Extract the files</li>
         <li>Add the bin folder to your system's PATH variable</li>
 
+Once all this is done, you can run
+
+        python main.py
 
 
