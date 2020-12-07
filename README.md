@@ -12,4 +12,9 @@ If you would like to run this, clone this repository, type the following command
         pip install requirements.txt
         
 IMPORTANT NOTE: If you are on windows, you will need to do the following to install ffmpeg:
+<list>
+<li>Download ffmpeg from https://ffmpeg.org/download.html.</li>
+<li>Extract the files
+-
+</list?
 
