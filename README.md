@@ -20,4 +20,6 @@ Once all this is done, you can run
 
         python main.py
 
+Have fun!
 
+-Andrew, Anisha, Nico, Robert
