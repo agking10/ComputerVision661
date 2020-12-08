@@ -73,8 +73,12 @@ args = vars(ap.parse_args())
 greenLower = (29, 86, 6)
 greenUpper = (90, 255, 255)
 
-redLower = (86, 6, 29)
-redUpper = (255, 64, 255)
+redLower = (150, 50, 6)
+redUpper = (210, 255, 255)
+
+blueLower = (90, 50, 6)
+blueUpper = (130, 255, 255)
+
 # initialize the list of tracked points, the frame counter,
 # and the coordinate deltas
 pts1 = deque(maxlen=args["buffer"])
