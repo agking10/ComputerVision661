@@ -42,21 +42,27 @@ def Regionify(img, instrument='drums'):
         velx = 0
         vely = -70
         # Determine coords to be scaled, assuming 1000x1000
-        wanted_x = [333, 666, 1000, velx]
+        wanted_x = [166, 333, 500, 666, 833, 1000, velx]
         wanted_y = [666, 1000, vely]
 
         # Scale the coords
         scaled_x, scaled_y = scale(wanted_x, wanted_y, cols, rows)
 
         # Define sound reference dictionary
-        references = {1: ('drums1.wav', [velx, vely]),
-                      2: ('drums2.wav', [velx, vely]),
-                      3: ('drums3.wav', [velx, vely])}
+        references = {1: ('/drums/kick.wav', [velx, vely]),
+                      2: ('/drums/lowtom.wav', [velx, vely]),
+                      3: ('/drums/snare.wav', [velx, vely]),
+                      4: ('/drums/ridebell.wav', [velx, vely]),
+                      5: ('/drums/hihat.wav', [velx, vely]),
+                      6: ('/drums/hitom.wav', [velx, vely])}
 
         # DEFINE REGIONS
         regions = np.array([[[scaled_y[0], 0], [scaled_y[1], scaled_x[0]]]
                                , [[scaled_y[0], scaled_x[0]], [scaled_y[1], scaled_x[1]]]
                                , [[scaled_y[0], scaled_x[1]], [scaled_y[1], scaled_x[2]]]
+                               , [[scaled_y[0], scaled_x[2]], [scaled_y[1], scaled_x[3]]]
+                               , [[scaled_y[0], scaled_x[3]], [scaled_y[1], scaled_x[4]]]
+                               , [[scaled_y[0], scaled_x[4]], [scaled_y[1], scaled_x[5]]]
                             ]).astype(np.int)
 
         # Populate instrument regions array
@@ -76,12 +82,12 @@ def Regionify(img, instrument='drums'):
         scaled_x, scaled_y = scale(wanted_x, wanted_y, cols, rows)
 
         # Define sound reference dictionary
-        references = {1: ('b.wav', [velx, vely]),
-                      2: ('c.wav', [velx, vely]),
-                      3: ('d.wav', [velx, vely]),
-                      4: ('e.wav', [velx, vely]),
-                      5: ('f.wav', [velx, vely]),
-                      6: ('g.wav', [velx, vely])}
+        references = {1: ('/xylophone/b.wav', [velx, vely]),
+                      2: ('/xylophone/c.wav', [velx, vely]),
+                      3: ('/xylophone/d.wav', [velx, vely]),
+                      4: ('/xylophone/e.wav', [velx, vely]),
+                      5: ('/xylophone/c2.wav', [velx, vely]),
+                      6: ('/xylophone/g.wav', [velx, vely])}
 
         # DEFINE REGIONS
         regions = np.array([[[scaled_y[0], 0], [scaled_y[1], scaled_x[0]]]

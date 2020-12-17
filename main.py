@@ -101,9 +101,21 @@ time.sleep(2.0)
 
 num_objs = int(input("Enter how many balls you are using: "))
 
+
+possible_instruments = ['xylophone', 'drums']
+while True:
+    print("\nCurrent instrument options are: " + str(possible_instruments))
+    instrument = input("Enter which instrument you would like to play: ")
+    for i in possible_instruments:
+        if instrument == i:
+            chosen_instrument = i
+    if chosen_instrument == instrument:
+        break
+    print("Incorrect instrument chosen! Try again.")
+
 frame = vs.read()
 rows, cols, channels = frame.shape
-regions, references = Regionify(frame, instrument="xylophone")
+regions, references = Regionify(frame, instrument=instrument)
 regions = imutils.resize(regions, width = 600)
 regions_3D = regions.reshape(regions.shape[0],regions.shape[1],1)
 regions_3D = np.concatenate((regions_3D,regions_3D,regions_3D),axis = 2)
