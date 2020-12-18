@@ -21,12 +21,19 @@ def detect_objects(img, pts, num_objs = 1, color = 'green'):
     # a series of dilations and erosions to remove any small
     # blobs left in the mask
     if (color == 'green'):
-        upper_hsv = greenUpper
-        lower_hsv = greenLower
+        upper_hsv = (90, 255, 255)
+        lower_hsv = (29, 86, 6)
+        mask = cv2.inRange(hsv, lower_hsv, upper_hsv)
+
     if (color == 'red'):
-        upper_hsv = redUpper
-        lower_hsv = redLower
-    mask = cv2.inRange(hsv, lower_hsv, upper_hsv)
+        upper_hsv = (10, 255, 255)
+        lower_hsv = (0, 120, 70)
+        mask1 = cv2.inRange(hsv, lower_hsv, upper_hsv)
+        upper_hsv = (170, 120, 70)
+        lower_hsv = (180, 255, 255)
+        mask2 = cv2.inRange(hsv, lower_hsv, upper_hsv)
+        mask = mask1 + mask2
+        
     mask = cv2.erode(mask, None, iterations=2)
     mask = cv2.dilate(mask, None, iterations=2)
     # find contours in the mask and initialize the current
@@ -67,17 +74,6 @@ ap.add_argument("-v", "--video",
 ap.add_argument("-b", "--buffer", type=int, default=32,
     help="max buffer size")
 args = vars(ap.parse_args())
-
-# define the lower and upper boundaries of the "green"
-# ball in the HSV color space
-greenLower = (29, 86, 6)
-greenUpper = (90, 255, 255)
-
-redLower = (150, 50, 6)
-redUpper = (210, 255, 255)
-
-blueLower = (90, 50, 6)
-blueUpper = (130, 255, 255)
 
 # initialize the list of tracked points, the frame counter,
 # and the coordinate deltas
